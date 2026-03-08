@@ -24,6 +24,9 @@ User:
       type: array
       items:
         $ref: './schemas2.yaml#/Project'
+    something:
+      description: <ENCRYPT>
+      $ref: './schemas2.yaml#/Something'
 
 Project:
   type: object

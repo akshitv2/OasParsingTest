@@ -8,3 +8,6 @@ Project:
       description: <ENCRYPT>
     isPublic:
       type: boolean
+Something:
+  description: this is something
+  type: string
