@@ -1,0 +1,10 @@
+Project:
+  type: object
+  properties:
+    projectId:
+      type: string
+    projectName:
+      type: string
+      description: <ENCRYPT>
+    isPublic:
+      type: boolean

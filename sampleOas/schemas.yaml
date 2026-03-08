@@ -1,0 +1,37 @@
+User:
+  type: object
+  properties:
+    id:
+      type: string
+      format: uuid
+    username:
+      type: string
+      example: "octocat"
+    email:
+      type: string
+      format: email
+    status:
+      type: string
+      enum: [active, inactive]
+    encryptedString:
+      type: string
+      description: <ENCRYPT>
+    userProjects:
+      type: array
+      items:
+        $ref: './schemas2.yaml#/Project'
+    userProjects2:
+      type: array
+      items:
+        $ref: './schemas2.yaml#/Project'
+
+Project:
+  type: object
+  properties:
+    projectId:
+      type: string
+    projectName:
+      type: string
+      description: <ENCRYPT>
+    isPublic:
+      type: boolean
