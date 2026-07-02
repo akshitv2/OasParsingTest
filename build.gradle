@@ -14,6 +14,9 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'io.swagger.parser.v3:swagger-parser:2.1.22'
+
+    // Source: https://mvnrepository.com/artifact/com.atlassian.oai/swagger-request-validator-core
+    implementation("com.atlassian.oai:swagger-request-validator-core:2.38.0")
 }
 
 test {

@@ -1,0 +1,122 @@
+openapi: 3.0.5
+info:
+  title: Parameter Serialization Showcase
+  version: 1.0.0
+paths:
+  /users/{id}:
+    get:
+      summary: Path style examples (Matrix and Label)
+      parameters:
+        # Matrix Style, Explode False
+        - name: id
+          in: path
+          required: true
+          style: matrix
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+              maxLength: 4
+      responses:
+        '200':
+          description:
+  /usersA/{id}:
+    get:
+      summary: Path style examples (Matrix and Label)
+      parameters:
+        # Matrix Style, Explode False
+        - name: id
+          in: path
+          required: true
+          style: matrix
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              maxLength: 4
+      responses:
+        '200':
+          description: OK
+
+  /items/{tags}:
+    get:
+      summary: Path style examples (Label with Dot-Prefix)
+      parameters:
+        # Label Style, Explode True
+        - name: tags
+          in: path
+          required: true
+          style: label
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+              maxLength: 5
+      responses:
+        '200':
+          description: OK
+  /itemsB/{tags}:
+    get:
+      summary: Path style examples (Label with Dot-Prefix)
+      parameters:
+        # Label Style, Explode True
+        - name: tags
+          in: path
+          required: true
+          style: label
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              maxLength: 5
+      responses:
+        '200':
+          description: OK
+
+  /search:
+    get:
+      summary: Query style examples (Delimiters and DeepObjects)
+      parameters:
+        # Space Delimited
+        - name: colors
+          in: query
+          required: false
+          style: spaceDelimited
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+              maxLength: 4
+        # Pipe Delimited
+        - name: flags
+          in: query
+          required: false
+          style: pipeDelimited
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
+              maxLength: 5
+        # Deep Object Serialization
+        - name: filter
+          in: query
+          required: false
+          style: deepObject
+          explode: true
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              role:
+                type: string
+                maxLength: 3
+      responses:
+        '200':
+          description: OK

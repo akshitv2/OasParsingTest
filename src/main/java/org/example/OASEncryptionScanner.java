@@ -24,7 +24,7 @@ public class OASEncryptionScanner {
 
         ParseOptions options = new ParseOptions();
         options.setResolve(true);
-        options.setResolveFully(true); // Inlines external files
+        options.setResolveFully(false); // Inlines external files
 
         SwaggerParseResult result = new OpenAPIV3Parser().readLocation(absolutePath, null, options);
 
@@ -102,5 +102,66 @@ public class OASEncryptionScanner {
             if (cs.getAnyOf() != null) cs.getAnyOf().forEach(s -> scanSchema(jsonPath, s, new HashSet<>(visited)));
             if (cs.getOneOf() != null) cs.getOneOf().forEach(s -> scanSchema(jsonPath, s, new HashSet<>(visited)));
         }
+    }
+
+    private static void stitchRefDescriptions(OpenAPI openAPI) {
+        if (openAPI.getComponents() == null || openAPI.getComponents().getSchemas() == null) return;
+
+        openAPI.getPaths().forEach((path, pathItem) -> {
+            pathItem.readOperations().forEach(op -> {
+                // Check Request Body
+                if (op.getRequestBody() != null && op.getRequestBody().getContent() != null) {
+                    op.getRequestBody().getContent().forEach((type, media) ->
+                            preserveDescription(media.getSchema(), openAPI));
+                }
+                // Check Responses
+                if (op.getResponses() != null) {
+                    op.getResponses().forEach((code, resp) -> {
+                        if (resp.getContent() != null) {
+                            resp.getContent().forEach((type, media) ->
+                                    preserveDescription(media.getSchema(), openAPI));
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    private static void preserveDescription(Schema<?> schema, OpenAPI openAPI) {
+        if (schema == null) return;
+
+        // Check properties for the $ref + description combo
+        if (schema.getProperties() != null) {
+            schema.getProperties().forEach((name, prop) -> {
+                if (prop.get$ref() != null && prop.getDescription() != null) {
+                    // We found a sibling description!
+                    // Let's find the target and append it.
+                    Schema<?> target = getReferencedSchema(openAPI, prop.get$ref());
+                    if (target != null) {
+                        String newDesc = (target.getDescription() == null ? "" : target.getDescription() + " ")
+                                + prop.getDescription();
+                        target.setDescription(newDesc);
+                    }
+                }
+                preserveDescription(prop, openAPI);
+            });
+        }
+    }
+
+    private static Schema<?> getReferencedSchema(OpenAPI openAPI, String ref) {
+        if (ref == null || openAPI.getComponents() == null || openAPI.getComponents().getSchemas() == null) {
+            return null;
+        }
+
+        // Usually refs look like: #/components/schemas/MyModel
+        // or ./otherFile.yaml#/components/schemas/MyModel
+        String schemaName;
+        if (ref.contains("/")) {
+            schemaName = ref.substring(ref.lastIndexOf("/") + 1);
+        } else {
+            schemaName = ref;
+        }
+
+        return openAPI.getComponents().getSchemas().get(schemaName);
     }
 }
